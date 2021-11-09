@@ -1,0 +1,1 @@
+# Sample scripts to use RADARSAT-1 imagery
