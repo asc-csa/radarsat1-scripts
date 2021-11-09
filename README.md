@@ -1,8 +1,12 @@
-﻿![RADARSAT-1 au-dessus du Canada | RADARSAT-1 over Canada](radarsat1-image.jpg)
+﻿<p align="center">
+    <img src="https://github.com/asc-csa/radarsat1-scripts/blob/main/radarsat1-image.jpg?raw=true" height="200">
+</p>
 
-![Dernier commit sur GitHub | GitHub last commit](https://img.shields.io/github/last-commit/asc-csa/radarsat1-scripts)
-![Contributeurs sur GitHub | GitHub contributors](https://img.shields.io/github/contributors/asc-csa/radarsat1-scripts)
-![Suivez l'ASC sur Twitter | Follow the CSA on Twitter](https://img.shields.io/twitter/follow/csa_asc?style=social)
+<p align="center">
+    <img alt="Dernier commit sur GitHub | GitHub last commit" src="https://img.shields.io/github/last-commit/asc-csa/radarsat1-scripts">
+    <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/asc-csa/radarsat1-scripts">
+    <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/csa_asc?style=social">
+</p>
 
 # Scripts RADARSAT-1 (English follows)
 
@@ -17,7 +21,6 @@ Le fichier /src/ contient plusieurs exemples de scripts pour commencer :
 - sample_algorithms.py contient divers algorithmes simples qui peuvent être appliqués aux images pour démontrer les cas d'utilisation possibles.
 
 Parallèlement à ces fichiers, un pipeline de données est réalisé pour créer un modèle ML capable de calculer la proportion d'un lac gelé à partir d'une image RADARSAT-1.
-
 
 # RADARSAT-1 Scripts (Le français précède)
 
