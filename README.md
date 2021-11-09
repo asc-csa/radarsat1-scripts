@@ -1,1 +1,7 @@
-# Sample scripts to use RADARSAT-1 imagery
+﻿English below
+# Scripts RadarSat-1
+Dépôt contenant des fonctions d'aide utilisées pour accéder et télécharger des fichiers à partir d'un seau S3 contenant des images .tff de RadarSat-1. Plus d'informations concernant le seau et RadarSat-1 peuvent être trouvées ici (https://registry.opendata.aws/radarsat-1/).  Downloading_files.py suit son homonyme et est utilisé pour télécharger facilement des fichiers à partir du seau S3 en fonction de diverses métriques telles que la date. Get_metadata.py est utilisé pour lire les métadonnées des fichiers sans avoir à les télécharger depuis le seau s3. Sample_algorithms.py contient divers algorithmes simples qui peuvent être appliqués aux images pour démontrer les cas d'utilisation possibles. Parallèlement à ces fichiers, un pipeline de données est en cours de réalisation pour créer un modèle ML capable de calculer la proportion d'un lac gelé à partir d'une image RadarSat-1. 
+
+
+# RadarSat-1 Scripts
+Repository containing helper functions used to access and download files from an S3 bucket containing .tff RadarSat-1 images. More information regarding the bucket and RadarSat-1 can be found here (https://registry.opendata.aws/radarsat-1/).  Downloading_files.py follows its namesake and is used to easily download files from the s3 bucket based on various metrics such as date. Get_metadata.py is used to read metadata from the files without having to download them from the s3 bucket. Sample_algorithms.py contains various simple algorithms that can be applied to the images to demonstrate possible use cases. Alongside these files a data pipeline is being made to create an ML model that is able to calculate how much of a lake is frozen based on an RadarSat-1 image.
