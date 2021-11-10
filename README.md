@@ -18,7 +18,7 @@ Le fichier /src/ contient plusieurs exemples de scripts pour commencer :
 
 - [downloading_files.py](src/downloading_files.py) est utilisé pour télécharger facilement des fichiers à partir du compartiment s3 en fonction de divers paramètres tels que la date, le pays ou les coordonnées.
 - [get_metadata.py](src/get_metadata.py) est utilisé pour lire les métadonnées des fichiers sans avoir à les télécharger depuis le compartiment s3.
-- [sample_algorithms.py](sample_algorithms.py) contient divers algorithmes simples qui peuvent être appliqués aux images pour démontrer les cas d'utilisation possibles.
+- [sample_algorithms.py](src/sample_algorithms.py) contient divers algorithmes simples qui peuvent être appliqués aux images pour démontrer les cas d'utilisation possibles.
 
 # RADARSAT-1 Scripts (Le français précède)
 
@@ -28,4 +28,4 @@ Inside the /src/ file are several sample scripts to start with:
 
 - [downloading_files.py](src/downloading_files.py) is used to easily download files from the S3 bucket based on various metrics such as date, country, or coordinates.
 - [get_metadata.py](src/get_metadata.py) is used to read metadata from the files without having to download them from the S3 bucket.
-- [sample_algorithms.py](sample_algorithms.py) contains various simple algorithms that can be applied to the images to demonstrate possible use cases.
+- [sample_algorithms.py](src/sample_algorithms.py) contains various simple algorithms that can be applied to the images to demonstrate possible use cases.
