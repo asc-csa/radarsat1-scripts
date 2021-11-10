@@ -55,6 +55,7 @@ def get_data_from_month_and_year(year = -1, month = -1):
                     columns = []
                     for column in metadata["Metadata"]:
                         columns.append(column)
+                    columns.append('download_link')
                     list.append(columns)
                     column_names = False
                 temp = []
@@ -68,6 +69,7 @@ def get_data_from_month_and_year(year = -1, month = -1):
                         counter += 1
                     counter += 1
                     temp.append(value)
+                temp.append('https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key'])
                 list.append(temp)
                 if (len(temp) != len(columns)):
                     print("Not equal!")
@@ -141,6 +143,7 @@ def get_data_by_country(country_name):
                     columns = []
                     for column in metadata["Metadata"]:
                         columns.append(column)
+                    columns.append('download_link')
                     list.append(columns)
                     column_names = False
                 temp = []
@@ -174,9 +177,10 @@ def get_data_by_country(country_name):
                                 counter += 1
                             counter += 1
                             temp.append(value)
+                        temp.append('https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key'])
                         list.append(temp)
-                    if (len(temp) != len(columns)):
-                        print("Not equal!")
+                        if (len(temp) != len(columns)):
+                            print("Not equal!")
                 
             except Exception as e:
                 print(e)

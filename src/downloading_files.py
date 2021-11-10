@@ -162,7 +162,7 @@ def download_by_coordinates(latitude, longitude, range=1.5, limit=float("inf")):
                 if (diff_long <= range and diff_lat <= range):
                     filename = metadata['Metadata']['scene-centre'] + ".tif"
                     date = metadata['Metadata']['end-date'].split('-')
-                    key = date[0] + "/" + date[1] + "/" + filename
+                    key = date[0] + "/" + str(int(date[1])) + "/" + filename
 
                     # We then download the file
                     if not os.path.exists(os.path.dirname(key)):
