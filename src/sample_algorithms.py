@@ -147,5 +147,3 @@ def chart_imagery_by_date(start_year=1996, start_month=3, end_year=2013, end_mon
 
     # Display the chart.
     plt.show()
-
-chart_imagery_by_date(1996,3,1996,4)
