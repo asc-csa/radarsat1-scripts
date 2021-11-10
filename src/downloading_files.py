@@ -178,5 +178,3 @@ def download_by_coordinates(latitude, longitude, range=1.5, limit=float("inf")):
                 print(e)
                 print(traceback.format_exc())
                 print("Failed {}".format(file['Key']))
-
-download_by_coordinates(61.4, -114.7, 2.5, 10)

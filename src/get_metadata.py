@@ -114,7 +114,7 @@ def get_data_from_date_range(start_year=1996, start_month=3, end_year=2013, end_
     return super_data
 
 def get_data_by_country(country_name):
-    """Gets the data from the S3 bucket for a given month / year.
+    """Gets the data from the S3 bucket for a given country.
 
     :param country_name: Name of the country to download metadata from.
     """
@@ -210,7 +210,3 @@ def get_data_from_filename(file_name):
 
     # We can then create a dataframe and return it
     return pd.DataFrame(list, columns=metadata["Metadata"].keys())
-
-filename = "RS1_X0492791_SCWA_19981029_201337_HH_SCW.tif"
-metadata = get_data_from_filename(filename)
-print(metadata)
