@@ -55,19 +55,20 @@ def get_data_from_month_and_year(year = -1, month = -1):
                     columns = []
                     for column in metadata["Metadata"]:
                         columns.append(column)
+                    columns.append('download_link')
                     list.append(columns)
                     column_names = False
-                temp = []
+                temp = [None] * len(columns)
 
                 # We then append the value of each metadata field
                 counter = 0
                 for key, value in metadata["Metadata"].items():
-                    # Sometimes there is a missing key in the metadata, this ensures a value is still given
-                    while columns[counter] != key:
-                        temp.append(None)
-                        counter += 1
-                    counter += 1
-                    temp.append(value)
+                    for i in range(len(columns) - 1):
+                        if columns[i] == key:
+                            temp[i] = value
+                            counter += 1
+                            break
+                temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
                 list.append(temp)
                 if (len(temp) != len(columns)):
                     print("Not equal!")
@@ -141,9 +142,10 @@ def get_data_by_country(country_name):
                     columns = []
                     for column in metadata["Metadata"]:
                         columns.append(column)
+                    columns.append('download_link')
                     list.append(columns)
                     column_names = False
-                temp = []
+                temp = [None] * len(columns)
                 
                 # We then have to use the metadata to get the longitude and latitude
                 test = metadata['Metadata']['scene-centre']
@@ -168,15 +170,15 @@ def get_data_by_country(country_name):
                         # We then append the value of each metadata field
                         counter = 0
                         for key, value in metadata["Metadata"].items():
-                            # Sometimes there is a missing key in the metadata, this ensures a value is still given
-                            while columns[counter] != key:
-                                temp.append(None)
-                                counter += 1
-                            counter += 1
-                            temp.append(value)
+                            for i in range(len(columns) - 1):
+                                if columns[i] == key:
+                                    temp[i] = value
+                                    counter += 1
+                                    break
+                        temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
                         list.append(temp)
-                    if (len(temp) != len(columns)):
-                        print("Not equal!")
+                        if (len(temp) != len(columns)):
+                            print("Not equal!")
                 
             except Exception as e:
                 print(e)
