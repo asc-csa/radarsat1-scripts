@@ -68,7 +68,7 @@ def get_data_from_month_and_year(year = -1, month = -1):
                             temp[i] = value
                             counter += 1
                             break
-                temp[counter] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
+                temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
                 list.append(temp)
                 if (len(temp) != len(columns)):
                     print("Not equal!")
@@ -175,7 +175,7 @@ def get_data_by_country(country_name):
                                     temp[i] = value
                                     counter += 1
                                     break
-                        temp[counter] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
+                        temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
                         list.append(temp)
                         if (len(temp) != len(columns)):
                             print("Not equal!")
@@ -212,7 +212,3 @@ def get_data_from_filename(file_name):
 
     # We can then create a dataframe and return it
     return pd.DataFrame(list, columns=metadata["Metadata"].keys())
-
-df = get_data_from_month_and_year(1997,7)
-print(df)
-print(df[df['sensor-mode'] == 'Fine'])
