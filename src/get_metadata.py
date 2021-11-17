@@ -1,6 +1,10 @@
 import pandas as pd
-import plotly.express as px
 import boto3
+from pandas_schema import Column, Schema
+from pandas_schema.validation import (
+    InListValidation,
+    CustomElementValidation
+)
 from botocore import UNSIGNED
 from botocore.config import Config
 from geopy.geocoders import Nominatim
@@ -10,11 +14,98 @@ BUCKET_NAME = 'radarsat-r1-l1-cog'
 s3client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 paginator = s3client.get_paginator('list_objects_v2')
 
-def get_data_from_month_and_year(year = -1, month = -1):
+def date_validator(str):
+    """ Validates that the date is in the correct format.
+
+    :param str: String containing the date to be validated.
+    """
+    if int(str.split('-')[0]) < 1996 or int(str.split('-')[0]) > 2013:
+        return False
+    if int(str.split('-')[1]) < 1 or int(str.split('-')[1]) > 12:
+        return False
+    if int(str.split('-')[2].split('T')[0]) < 1 or int(str.split('-')[2].split('T')[0]) > 31:
+        return False
+    return True
+
+def check_int(num):
+    """ Checks if a string is an integer.
+    
+    :param num: String to be checked.
+    """
+    try:
+        int(num)
+    except ValueError:
+        return False
+    return True
+
+def check_float(num):
+    """ Checks if a string is a float.
+
+    :param num: String to be checked.
+    """
+    try:
+        float(num)
+    except ValueError:
+        return False
+    return True
+
+# A series of validations to check different aspects of the data.
+date_validation = [CustomElementValidation(lambda d: date_validator(d), 'Date is not valid')]
+int_validation = [CustomElementValidation(lambda d: check_int(d), 'Int is not valid')]
+float_validation = [CustomElementValidation(lambda d: check_float(d), 'Float is not valid')]
+bool_validation = [CustomElementValidation(lambda d: d or not d, 'Bool is not valid')]
+point_validation = [CustomElementValidation(lambda d: 'POINT' in d, 'Point is not valid')]
+polygon_validation = [CustomElementValidation(lambda d: 'POLYGON' in d, 'Polygon is not valid')]
+version_validation = [CustomElementValidation(lambda d: 'V' in d or 'VER' in d, 'Polygon is not valid')]
+title_validation = [CustomElementValidation(lambda d: 'rsat1_' in d, 'Polygon is not valid')]
+url_validation = [CustomElementValidation(lambda d: 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' in d, 'URL is not valid')]
+
+# We then declare the schema for the data using pandas_schema to validate the data
+schema = Schema([
+    Column('product-type', [CustomElementValidation(lambda s: len(s) == 3, 'was not 3 characters')]),
+    Column('start-date', date_validation),
+    Column('product-format', [InListValidation(['CEOS'])]),
+    Column('scene-centre', point_validation),
+    Column('pixel-spacing', float_validation),
+    Column('sensor', [InListValidation(['RADARSAT-1'])]),
+    Column('image-pixels', int_validation),
+    Column('sensor-mode', [InListValidation(['Fine', 'High Incidence', 'Low Incidence', 'ScanSAR Narrow', 'ScanSAR Wide', 'Standard', 'Wide', None])], allow_empty=True),
+    Column('orbit-direction', [InListValidation(['Ascending', 'Descending', None])], allow_empty=True),
+    Column('polarization', [InListValidation(['HH', 'HV', 'VH', 'VV', None])], allow_empty=True),
+    Column('corner-coordinates', polygon_validation),
+    Column('processing-level', [InListValidation(['l1'])]),
+    Column('processor-version', version_validation),
+    Column('product-id', [CustomElementValidation(lambda s: len(s) == 8, 'was not 3 characters')], allow_empty=True),
+    Column('public-good', bool_validation),
+    Column('low-incidence-angle', int_validation),
+    Column('high-incidence-angle', int_validation),
+    Column('image-lines', int_validation),
+    Column('end-date', date_validation),
+    Column('absolute-orbit', int_validation),
+    Column('beam', [InListValidation(['Fine 1', 'Fine 2', 'Fine 3', 'Fine 4', 'Fine 5', 'High Incidence 3', 'High Incidence 4', 'High Incidence 6', 'Low Incidence 1', 'ScanSAR Narrow A (W1 W2)', 'ScanSAR Narrow B (W2 S5 S6)', 'ScanSAR Wide A (W1 W2 W3 S7)', 'ScanSAR Wide B (W1 W2 S5 S6)', 'Standard 1', 'Standard 2', 'Standard 3', 'Standard 4', 'Standard 5', 'Standard 6', 'Standard 7', 'Wide 1', 'Wide 2', 'Wide 3', None])], allow_empty=True),
+    Column('delivery-date', date_validation),
+    Column('processing-date', date_validation),
+    Column('band', [InListValidation(['C'])]),
+    Column('spatial-resolution', int_validation),
+    Column('order-key'),
+    Column('position', [InListValidation(['EH3', 'EH4', 'EH6', 'EL1', 'F1', 'F2', 'F3', 'F4', 'F5', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'SCNA', 'SCNB', 'SCWA', 'SCWB', 'W1', 'W2', 'W3', None])], allow_empty=True),
+    Column('sequence-id', int_validation),
+    Column('title', title_validation),
+    Column('archive-visibility-start-date', date_validation),
+    Column('geodetic-terrain-height', int_validation),
+    Column('processor-name', [InListValidation(['MMSSARP', 'MSSAR', 'RSARPS/S', None])], allow_empty=True),
+    Column('look-orientation', [InListValidation(['left', 'right', None])], allow_empty=True),
+    Column('lut-applied', [InListValidation(['Ice', 'Land', 'Mixed', 'Point Target', 'Sea', 'Unity', None])], allow_empty=True),
+    Column('download_link', url_validation)
+])
+
+
+def get_data_from_month_and_year(year = -1, month = -1, to_csv=True):
     """Gets the data from the S3 bucket for a given month / year.
 
     :param year: Year of the data to be downloaded.
     :param month: Month of the data to be downloaded.
+    :param to_csv: Whether or not to convert the output to CSV.
     """
 
     # We limit our data by year or by month (if given)
@@ -61,12 +152,10 @@ def get_data_from_month_and_year(year = -1, month = -1):
                 temp = [None] * len(columns)
 
                 # We then append the value of each metadata field
-                counter = 0
                 for key, value in metadata["Metadata"].items():
                     for i in range(len(columns) - 1):
                         if columns[i] == key:
                             temp[i] = value
-                            counter += 1
                             break
                 temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
                 list.append(temp)
@@ -80,16 +169,27 @@ def get_data_from_month_and_year(year = -1, month = -1):
     # We pop the first element of the list, which is the column names for the dataframe
     column_names = list.pop(0)
 
-    # We can then create a dataframe and return it
-    return pd.DataFrame(list, columns=column_names)
+    # We can then look for errors in the data
+    df = pd.DataFrame(list, columns=column_names)
+    try:
+        errors = schema.validate(df)
+        pd.DataFrame(errors).to_csv("errors.csv")
+    except:
+        pass
 
-def get_data_from_date_range(start_year=1996, start_month=3, end_year=2013, end_month=3):
+    # We can then create a dataframe and return it
+    if to_csv:
+        df.to_csv(str(year) + '-' + str(month) + "_data.csv")
+    return df
+
+def get_data_from_date_range(start_year=1996, start_month=3, end_year=2013, end_month=3, to_csv=True):
     """Gets the data from the S3 bucket for a given date range.
 
     :param start_year: Year of the start of the date range.
     :param start_month: Month of the start of the date range.
     :param end_year: Year of the end of the date range.
     :param end_month: Month of the end of the date range.
+    :param to_csv: Whether or not to convert the output to CSV.
     """
     # Initialize an empty dataframe
     super_data = pd.DataFrame()
@@ -106,18 +206,20 @@ def get_data_from_date_range(start_year=1996, start_month=3, end_year=2013, end_
 
         # We then get the data for the current month
         if super_data.empty: # If the dataframe is empty, we just start it with the data
-            super_data = get_data_from_month_and_year(start_year, start_month)
+            super_data = get_data_from_month_and_year(start_year, start_month, False)
         else: # Otherwise, we append the data for the current month
-            data = get_data_from_month_and_year(start_year, start_month)
+            data = get_data_from_month_and_year(start_year, start_month, False)
             super_data = super_data.append(data, ignore_index = True)
         start_month += 1
-
+    if to_csv:
+        super_data.to_csv("data.csv")
     return super_data
 
-def get_data_by_country(country_name):
+def get_data_by_country(country_name, to_csv=True):
     """Gets the data from the S3 bucket for a given country.
 
     :param country_name: Name of the country to download metadata from.
+    :param to_csv: Whether or not to convert the output to CSV.
     """
 
     # We set up our parameters to make the call
@@ -168,12 +270,10 @@ def get_data_by_country(country_name):
                     # We then ensure the country matches the one we want
                     if country.lower() == country_name.lower():
                         # We then append the value of each metadata field
-                        counter = 0
                         for key, value in metadata["Metadata"].items():
                             for i in range(len(columns) - 1):
                                 if columns[i] == key:
                                     temp[i] = value
-                                    counter += 1
                                     break
                         temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
                         list.append(temp)
@@ -186,14 +286,25 @@ def get_data_by_country(country_name):
 
     # We pop the first element of the list, which is the column names for the dataframe
     column_names = list.pop(0)
+    df = pd.DataFrame(list, columns=column_names)
+
+    # We can then look for errors in the data
+    try:
+        errors = schema.validate(df)
+        pd.DataFrame(errors).to_csv("errors.csv")
+    except:
+        pass
 
     # We can then create a dataframe and return it
-    return pd.DataFrame(list, columns=column_names)
+    if to_csv:
+        df.to_csv(country_name + "_data.csv")
+    return df
 
-def get_data_from_filename(file_name):
+def get_data_from_filename(file_name, to_csv=True):
     """Gets the data from the S3 bucket for a given file.
 
     :param file_name: Name of the file to download metadata from.
+    :param to_csv: Whether or not to convert the output to CSV.
     """
 
     # We set up our parameters to make the call
@@ -210,5 +321,16 @@ def get_data_from_filename(file_name):
     for key, value in metadata["Metadata"].items():
         list.append(value)
 
-    # We can then create a dataframe and return it
-    return pd.DataFrame(list, columns=metadata["Metadata"].keys())
+    # We can then create a dataframe
+    df = pd.DataFrame(list, columns=metadata["Metadata"].keys())
+
+    # We can then look for errors in the data
+    try:
+        errors = schema.validate(df)
+        pd.DataFrame(errors).to_csv("errors.csv")
+    except:
+        pass
+
+    if to_csv:
+        df.to_csv(file_name + ".csv")
+    return df
