@@ -260,12 +260,16 @@ def get_data_by_country(country_name, to_csv=True):
                 coordinates = lat + ", " + long
                 geolocator = Nominatim(user_agent="radarsat-r1-l1-cog")
                 location = geolocator.reverse(coordinates, language='en')
-                address = location.address
+                if location:
+                    address = location.address
 
                 # If the address is not null, we know it's in a country
-                if (address):
-                    address = address.split(",")
-                    country = address[-1].strip()
+                if address and location:
+                    if type(address) is list:
+                        country = address[len(address) - 1]
+                    else:
+                        address = address.split(",")
+                        country = address[-1].strip()
 
                     # We then ensure the country matches the one we want
                     if country.lower() == country_name.lower():
@@ -279,7 +283,6 @@ def get_data_by_country(country_name, to_csv=True):
                         list.append(temp)
                         if (len(temp) != len(columns)):
                             print("Not equal!")
-                
             except Exception as e:
                 print(e)
                 print("Failed {}".format(file['Key']))
@@ -318,11 +321,13 @@ def get_data_from_filename(file_name, to_csv=True):
 
     # We then append the value of each metadata field
     list = []
+    cols = []
     for key, value in metadata["Metadata"].items():
         list.append(value)
+        cols.append(key)
 
     # We can then create a dataframe
-    df = pd.DataFrame(list, columns=metadata["Metadata"].keys())
+    df = pd.DataFrame([list], columns=cols)
 
     # We can then look for errors in the data
     try:
