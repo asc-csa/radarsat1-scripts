@@ -183,7 +183,7 @@ def get_data_from_month_and_year(year = -1, month = -1, to_csv=True):
     return df
 
 def get_data_from_date_range(start_year=1996, start_month=3, end_year=2013, end_month=3, to_csv=True):
-    """Gets the data from the S3 bucket for a given date range.
+    """Gets all the data from the S3 bucket for a given date range.
 
     :param start_year: Year of the start of the date range.
     :param start_month: Month of the start of the date range.
@@ -338,4 +338,86 @@ def get_data_from_filename(file_name, to_csv=True):
 
     if to_csv:
         df.to_csv(file_name + ".csv")
+    return df
+
+def get_data_for_attribute(attribute_name, attribute_value, to_csv=True):
+    """Gets data from the S3 bucket filtered by a given attribute.
+
+    :param attribute_name: Name of the attribute to filter by.
+    :param attribute_value: Value of the attribute to filter by.
+    :param to_csv: Whether or not to convert the output to CSV.
+    """
+
+    # We then set up our parameters to make the call
+    parameters = {
+        'Bucket': BUCKET_NAME
+    }
+
+    page_iterator = paginator.paginate(**parameters)
+
+    # Variables needed for the script
+    list = [] # A list of lists containing the metadata
+    column_names = True # Only runs during first iteration
+
+    # Iterates through the bucket
+    for bucket in page_iterator:
+        # If there is no data, we return an empty dataframe
+        if not 'Contents' in bucket:
+            return pd.DataFrame()
+
+        # Otherwise, we iterate through the contents
+        for file in bucket['Contents']:
+            try:
+                metadata = s3client.head_object(Bucket='radarsat-r1-l1-cog', Key=file['Key'])
+
+                # We first check that the attribute is contained in the metadata.
+                if metadata["Metadata"] and attribute_name in metadata["Metadata"]:
+                    # If so, we check that the attribute value is contained in the metadata.
+                    if metadata["Metadata"][attribute_name].lower() == attribute_value.lower():
+                        pass
+                    else: # If it doesn't match, we continue with the next file
+                        continue
+                else: # If it's not in the metadata, we continue with the next file
+                    continue
+
+                # During the first iteration, we create a list of columns using the metadata tags
+                if column_names:
+                    columns = []
+                    for column in metadata["Metadata"]:
+                        columns.append(column)
+                    columns.append('download_link')
+                    list.append(columns)
+                    column_names = False
+                temp = [None] * len(columns)
+
+                # We then append the value of each metadata field
+                for key, value in metadata["Metadata"].items():
+                    for i in range(len(columns) - 1):
+                        if columns[i] == key:
+                            temp[i] = value
+                            break
+                temp[len(columns) - 1] = 'https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/' + file['Key']
+                list.append(temp)
+                if (len(temp) != len(columns)):
+                    print("Not equal!")
+                
+            except Exception as e:
+                print(e)
+                print("Failed {}".format(file['Key']))
+                return
+
+    # We pop the first element of the list, which is the column names for the dataframe
+    column_names = list.pop(0)
+
+    # We can then look for errors in the data
+    df = pd.DataFrame(list, columns=column_names)
+    try:
+        errors = schema.validate(df)
+        pd.DataFrame(errors).to_csv("errors.csv")
+    except:
+        pass
+
+    # We can then create a dataframe and return it
+    if to_csv:
+        df.to_csv(attribute_name + "_" + attribute_value + "_data.csv")
     return df
