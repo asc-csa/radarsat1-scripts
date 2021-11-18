@@ -44,8 +44,8 @@ def create_a_map(start_year, start_month, end_year=-1, end_month=-1):
     # Create a map of the data.
     fig = px.scatter_geo(df, lat="Latitude", lon="Longitude", opacity=0.5)
     fig.show()
-    fig2 = px.density_mapbox(df, lat="Latitude", lon="Longitude", center=dict(lat=0, lon=180), zoom=0, mapbox_style="stamen-terrain")
-    fig2.show()
+    # fig2 = px.density_mapbox(df, lat="Latitude", lon="Longitude", center=dict(lat=0, lon=180), zoom=0, mapbox_style="stamen-terrain")
+    # fig2.show()
 
 
 ##################################################################################
@@ -102,7 +102,7 @@ def borders(img_url):
 
     # Outputs the images.
     output = np.hstack((img_gray, img_blur, img_new, img_filtered, edges))
-    cv2.imshow('Output', output)
+    plt.imshow(output)
 
     cv2.waitKey(0)
 
