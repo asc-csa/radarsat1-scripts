@@ -8,6 +8,7 @@ Les fichiers contenus dans ce dossier comprennent :
 
 * lakeice-measurements.xlsx - Données d'entraînement disponibles pour utilisation. Couvre les périodes avant et après la couverture de RADARSAT-1. Fournit les coordonnées et la couverture de glace pour divers lacs (0 = 0%, 10 = 100%).
 * find_if_has_imagery.py - Un script pour déterminer s'il y a de l'imagerie pour une coordonnée donnée à un moment donné, en utilisant le fichier ci-dessus. Il produit des fichiers avec une indication de la présence ou non d'une couverture.
+* downloading_lakes_for_analysis.py - Un script pour télécharger un ensemble de lacs pré-choisis à 0% et 100% de couverture de glace.
 
 # 2 - Lake Ice Coverage Analysis (Le français précède)
 
@@ -19,3 +20,4 @@ The files contained in this folder include:
 
 * lakeice-measurements.xlsx - Training data available for use. Spans periods before and after RADARSAT-1 coverage. Provides coordinates and ice coverage for various lakes (0 = 0%, 10 = 100%).
 * find_if_has_imagery.py - A script to determine whether there is imagery of a given coordinate at a given time, using the above file. Outputs files with an indication of whether there is coverage or not.
+* downloading_lakes_for_analysis.py - A script to download a set of pre-chosen lakes at 0% and 100% ice coverage.
