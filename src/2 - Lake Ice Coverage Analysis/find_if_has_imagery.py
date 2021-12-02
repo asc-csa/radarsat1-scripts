@@ -1,3 +1,6 @@
+# This file contains code to determine whether there is RADARSAT-1 coverage
+# for the locations and dates given in lakeice-measurements.xlsx.
+
 import pandas as pd
 import boto3
 from botocore import UNSIGNED
