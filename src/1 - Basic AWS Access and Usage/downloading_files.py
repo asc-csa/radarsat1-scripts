@@ -67,8 +67,15 @@ def download_file(file_name):
 
     :param file_name: Name of the file to download
     """
-    bucket = S3_RESOURCE.Bucket(BUCKET_NAME)
-    bucket.download_file(file_name, file_name)
+    if not os.path.exists(os.path.dirname(file_name)):
+        os.makedirs(os.path.dirname(file_name))
+
+    try:
+        print("Downloading:", file_name)
+        bucket = S3_RESOURCE.Bucket(BUCKET_NAME)
+        bucket.download_file(file_name, file_name)
+    except Exception as e:
+        print(e)
 
 def download_by_country(country_name, limit=float("inf")):
     """ Download all the files from the RADARSAT-1 bucket for a given country.
