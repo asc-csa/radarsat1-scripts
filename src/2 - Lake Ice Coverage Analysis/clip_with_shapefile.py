@@ -1,3 +1,5 @@
+# Note: Not currently working
+
 from osgeo import gdal
 
 # Files used for this example
