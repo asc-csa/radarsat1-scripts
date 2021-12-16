@@ -2,110 +2,53 @@
 # for the locations and dates given in lakeice-measurements.xlsx.
 
 import pandas as pd
-import boto3
-from botocore import UNSIGNED
-from botocore.config import Config
 
-# Setting up access
-BUCKET_NAME = 'radarsat-r1-l1-cog'
-s3client = boto3.client('s3', config=Config(signature_version=UNSIGNED))
-paginator = s3client.get_paginator('list_objects_v2')
+def get_coord_1(row):
+    row = str(row)
+    x = row.split('(')[1].split(' ')[0]
+    return x
 
+def get_coord_2(row):
+    row = str(row)
+    y = row.split('(')[1].split(' ')[1].split(')')[0]
+    return y
 
-def check_for_imagery(year = -1, month = -1, lat=0, long=0, validate = True):
-    """Determines if there is imagery for a given location at a given month and year.
-
-    :param year: Year of the data to be checked.
-    :param month: Month of the data to be checked.
-    :param lat: Latitude of the data to be checked.
-    :param long: Longitude of the data to be checked.
-    :param validate: Whether or not to validate the data.
-    """
-
-    # We limit our data by year or by month (if given)
-    if month != -1:
-        prefix = str(year) + "/" + str(month) + "/"
-    elif year != -1:
-        prefix = str(year) + "/"
-    else:
-        prefix = ""
-
-    # We then set up our parameters to make the call
-    parameters = {
-        'Bucket': BUCKET_NAME,
-        'Prefix': prefix
-    }
-
-    page_iterator = paginator.paginate(**parameters)
-
-    # Variables needed for the script
-    list = [] # A list of lists containing the metadata
-    column_names = True # Only runs during first iteration
-
-    # Iterates through the bucket
-    for bucket in page_iterator:
-        # If there is no data, we return an empty dataframe
-        if not 'Contents' in bucket:
-            print("Note: There is no imagery for year", year, "month", month)
-            return False
-
-        # Otherwise, we iterate through the contents
-        for file in bucket['Contents']:
-            try:
-                metadata = s3client.head_object(Bucket='radarsat-r1-l1-cog', Key=file['Key'])
-
-                # We then use the metadata to get the longitude and latitude
-                test = metadata['Metadata']['scene-centre']
-                if len((test).split("(")) < 2:
-                    continue
-                temp = test.split("(")[1].split(" ")
-                temp[1] = temp[1].replace(")", "")
-                longitude = str(temp[0])
-                latitude = str(temp[1])
-
-                # We use the difference between the longitude and latitude to determine if the data is in the correct location
-                diff_long = abs(float(long) - float(longitude))
-                diff_lat = abs(float(lat) - float(latitude))
-
-                # We then append the value of each metadata field
-                if (diff_long <= 1.0 and diff_lat <= 1.0):
-                    return True # If the data is within the range, we return true
-                
-            except Exception as e:
-                print(e)
-                print("Failed {}".format(file['Key']))
-    return False # If the data is not within the range, we return false
+def get_year(row):
+    if type(row) == str:
+        return row.split('-')[0]
+    return 0
+def get_month(row):
+    if type(row) == str:
+        return row.split('-')[1]
+    return 0
 
 df = pd.read_excel("lakeice-measurements.xlsx") # Reads the data
 
-has_coverage = [] # List to contain whether or not the data has R1 coverage
-test = {} # Indicator to show whether a given coordinate and date has already been tested
+df_r1 = pd.read_csv('r1_data_with_aws.csv') # Reads the R1 metadata file
 
-# Iterates through the data
-for index, row in df.iterrows():
-    date_str = str(row['DATE'])
-    name = str(row['NAME']) # Retrieves the name of the lake
-    date = date_str.split('-') # Splits the date into year, month, and day
+df_r1['long'] = [get_coord_1(row) for row in df_r1['scene-centre']] # Changes the coordinates to separate columns
+df_r1['lat'] = [get_coord_2(row) for row in df_r1['scene-centre']] # Changes the coordinates to separate columns
+df_r1['month'] = [get_month(row) for row in df_r1['start-date']] # Changes the date to separate columns
+df_r1['year'] = [get_year(row) for row in df_r1['start-date']] # Changes the date to separate columns
+df_r1 = df_r1.astype({'long': 'float64', 'lat': 'float64', 'month': 'int64', 'year': 'int64'})
 
-    # We then check if the data has already been tested
-    if name+date[0]+date[1] not in test:
-        # If it has not, we check if the data has R1 coverage
-        lat = float(row['LAT'])
-        long = 0.0 - float(row['LONG']) # west = negative
-        res = check_for_imagery(int(date[0]), int(date[1]), lat, long, False)
-
-        # We then append whether the lake has coverage or not
-        has_coverage.append(res)
-        test[name+date[0]+date[1]] = res
+def has_imagery(row, df_r1):
+    # Checks if a measurement has nearby coverage around the same time
+    df_restricted = df_r1[(df_r1['long'] >= float(row[1]['LONG']-15.0)) & (df_r1['long'] <= float(row[1]['LONG'])+15.0) & (df_r1['lat'] >= float(row[1]['LAT'])-15.0) & (df_r1['lat'] <= float(row[1]['LAT'])+15.0)]
+    if df_restricted.empty:
+        return None
     else:
-        # If the data has already been tested, we append the result from that check
-        print("Already checked")
-        has_coverage.append(test[name+date[0]+date[1]])
+        year = int(str(row[1]['DATE']).split('-')[0])
+        month = int(str(row[1]['DATE']).split('-')[1])
+        df_restricted = df_restricted[(df_restricted['year'] == year) & (df_restricted['month'] == month)]
+        if df_restricted.empty:
+            return None
+        else:
+            print(df_restricted['download_link'].str.split('https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/').to_list()[0][1])
+            return df_restricted['download_link'].str.split('https://s3-ca-central-1.amazonaws.com/radarsat-r1-l1-cog/').to_list()[0][1]
 
-# We then add the results to the dataframe and output it to a CSV
-df['R1 Coverage'] = has_coverage
-df.to_csv('lakeice-measurements-with-indicator.csv')
+df['has_coverage'] = [has_imagery(row, df_r1) for row in df.iterrows()]
 
-# We also output a dataframe only showing where the indicator is true, since these can be used to check the data
-df_trues = df[df['R1 Coverage'] == True].copy()
-df_trues.to_csv('R1_Lake_Coverage_Trues_Only.csv')
+output_df = df[df['has_coverage'].notnull()]
+
+output_df.to_csv('output2.csv')
