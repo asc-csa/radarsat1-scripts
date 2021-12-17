@@ -10,7 +10,7 @@ Les fichiers contenus dans ce dossier comprennent :
 * clip_with_shapefile.py - Script pour tenter de découper l'imagerie, ne fonctionne actuellement que pour certaines images.
 * download_matching_imagery.jpynb - Carnet de notes pour télécharger toutes les images qui correspondent aux mesures prises dans lakeice-measurements.xlsx.
 * Ice_Coverage_Analysis_r1.jpynb - Notebook pour analyser les images téléchargées par le script ci-dessus en les convertissant en histogrammes, en les traçant de différentes manières, et finalement en utilisant un algorithme d'apprentissage automatique sklearn pour prédire si une image contient de la glace ou non.
-* lakeice-measurements.xlsx - Données d'entraînement pour le script, utilisées avec la permission du programme du Service canadien des glaces.
+* lakeice-measurements.xlsx - Données d'entraînement pour le script, utilisées avec la permission du programme du Service canadien des glaces et Environnement et Changement climatique Canada.
 * r1_data_with_aws.csv - Métadonnées produites par les scripts dans le dossier 1 - Basic AWS Access and Usage.
 
 # 2 - Lake Ice Coverage Analysis (Le français précède)
@@ -25,5 +25,5 @@ The files contained in this folder include:
 * clip_with_shapefile.py - Script to attempt to clip imagery, only currently working for some imagery.
 * download_matching_imagery.jpynb - Notebook to download all imagery that matches measurements taken in lakeice-measurements.xlsx.
 * Ice_Coverage_Analysis_r1.jpynb - Notebook to analyze images downloaded by the above script by converting them to histograms, plotting them in various ways, and finally using an sklearn machine learning algorithm to predict if an image contains ice or not.
-* lakeice-measurements.xlsx - Training data for the script, used with permission of the Canadian Ice Service program.
+* lakeice-measurements.xlsx - Training data for the script, used with permission of the Canadian Ice Service program and Environment and Climate Change Canada.
 * r1_data_with_aws.csv - Metadata produced by scripts in the 1 - Basic AWS Access and Usage folder.
