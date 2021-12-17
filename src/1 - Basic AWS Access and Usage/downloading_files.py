@@ -67,6 +67,8 @@ def download_file(file_name):
 
     :param file_name: Name of the file to download
     """
+
+    # If the file directory does not exist, it must be created
     if not os.path.exists(os.path.dirname(file_name)):
         os.makedirs(os.path.dirname(file_name))
 

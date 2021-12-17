@@ -29,8 +29,6 @@ Le dossier /src/ comprend plusieurs sous-dossiers contenant les différents scri
 - [src/1 - Basic AWS Access and Usage](src/1%20-%20Basic%20AWS%20Access%20and%20Usage/README.md) contient les scripts produits au cours du travail exploratoire et de l'apprentissage du compartiment AWS.
 - [src/2 - Lake Ice Coverage Analysis](src/2%20-%20Lake%20Ice%20Coverage%20Analysis/README.md) contient des scripts permettant d'analyser les images du satellite RADARSAT-1 et de déterminer si elles contiennent des lacs couverts de glace.
 
-Pour voir des exemples de résultats des scripts, nous avons un [fichier de résultats](src/README.md) qui explique leurs résultats.
-
 # RADARSAT-1 Scripts (Le français précède)
 
 Repository containing helper functions used to access and download files from an S3 bucket containing .tiff RADARSAT-1 images. More information regarding the AWS bucket can be found on the [AWS Open Data Registry](https://registry.opendata.aws/radarsat-1/). More information about RADARSAT-1 can be found on the [Canadian Space Agency website](https://www.asc-csa.gc.ca/eng/satellites/radarsat1/what-is-radarsat1.asp).

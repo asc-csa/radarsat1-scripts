@@ -6,9 +6,12 @@ L'objectif de ce travail était de voir, à partir d'un ensemble de données d'e
 
 Les fichiers contenus dans ce dossier comprennent :
 
-* lakeice-measurements.xlsx - Données d'entraînement disponibles pour utilisation. Couvre les périodes avant et après la couverture de RADARSAT-1. Fournit les coordonnées et la couverture de glace pour divers lacs (0 = 0%, 10 = 100%).
-* find_if_has_imagery.py - Un script pour déterminer s'il y a de l'imagerie pour une coordonnée donnée à un moment donné, en utilisant le fichier ci-dessus. Il produit des fichiers avec une indication de la présence ou non d'une couverture.
-* downloading_lakes_for_analysis.py - Un script pour télécharger un ensemble de lacs pré-choisis à 0% et 100% de couverture de glace.
+* /shapefile - Contient les fichiers de forme qui peuvent éventuellement être utilisés pour découper l'imagerie pour un apprentissage automatique plus précis.
+* clip_with_shapefile.py - Script pour tenter de découper l'imagerie, ne fonctionne actuellement que pour certaines images.
+* download_matching_imagery.jpynb - Carnet de notes pour télécharger toutes les images qui correspondent aux mesures prises dans lakeice-measurements.xlsx.
+* Ice_Coverage_Analysis_r1.jpynb - Notebook pour analyser les images téléchargées par le script ci-dessus en les convertissant en histogrammes, en les traçant de différentes manières, et finalement en utilisant un algorithme d'apprentissage automatique sklearn pour prédire si une image contient de la glace ou non.
+* lakeice-measurements.xlsx - Données d'entraînement pour le script, utilisées avec la permission du programme du Service canadien des glaces et Environnement et Changement climatique Canada.
+* r1_data_with_aws.csv - Métadonnées produites par les scripts dans le dossier 1 - Basic AWS Access and Usage.
 
 # 2 - Lake Ice Coverage Analysis (Le français précède)
 
@@ -18,6 +21,9 @@ The objective of this work was to see, given a training set of data, whether we 
 
 The files contained in this folder include:
 
-* lakeice-measurements.xlsx - Training data available for use. Spans periods before and after RADARSAT-1 coverage. Provides coordinates and ice coverage for various lakes (0 = 0%, 10 = 100%).
-* find_if_has_imagery.py - A script to determine whether there is imagery of a given coordinate at a given time, using the above file. Outputs files with an indication of whether there is coverage or not.
-* downloading_lakes_for_analysis.py - A script to download a set of pre-chosen lakes at 0% and 100% ice coverage.
+* /shapefile - Contains the shape files that can eventually be used for clipping the imagery for more accurate machine learning.
+* clip_with_shapefile.py - Script to attempt to clip imagery, only currently working for some imagery.
+* download_matching_imagery.jpynb - Notebook to download all imagery that matches measurements taken in lakeice-measurements.xlsx.
+* Ice_Coverage_Analysis_r1.jpynb - Notebook to analyze images downloaded by the above script by converting them to histograms, plotting them in various ways, and finally using an sklearn machine learning algorithm to predict if an image contains ice or not.
+* lakeice-measurements.xlsx - Training data for the script, used with permission of the Canadian Ice Service program and Environment and Climate Change Canada.
+* r1_data_with_aws.csv - Metadata produced by scripts in the 1 - Basic AWS Access and Usage folder.
